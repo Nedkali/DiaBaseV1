@@ -340,7 +340,7 @@ function Log_DoIt(verbose) {
 				if(me.gametype){_file.WriteLine("True");}
 				if(!me.gametype){_file.WriteLine("False");}
 				_file.WriteLine(mytime);
-				_file.WriteLine(mydate.getDate() + "\\" + (mydate.getMonth()+1) + "\\" + mydate.getFullYear());
+				_file.WriteLine(mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear());
 				_file.WriteLine("");
 				for (var i = 0; i < logged.length; i++)
 					ItemDecipher(_file, logged[i], verbose);
