@@ -1,5 +1,5 @@
 // DiaBase Vers 1.0
-
+var settings = "";
 var verboseLogging = false;
 
 //NTConfig_Script.push("TLInventory.ntj"); //Add this line to your NT Config to run it
@@ -21,11 +21,15 @@ function NTMain()
     NT_LoadConfig();
 	SetStatusText(" CBMuleLogging.ntj");
     Print(COLOR_3 + "[MuleLog Inventory] - Load");
-
+	RegisterEvent(EVENT_SCRIPTMSG, CBML_ScriptMsgEvents);
+	
     if(!CLTM_CheckAct()) { CLC_SendMsgToScript("TLInventory.ntj", "CLTM_CheckAct()"); return; }
 	
 	if(DiaBaseSupport){
-		CBML_GetMuleInfo();
+		Print("Waiting for message");
+		while(settings != "done")
+			Delay(1000);
+
 		Delay(500);
 		CBML_LogIt(true);
 	}
@@ -283,17 +287,10 @@ function GetItemBase(id)
 	return "Unknown";
 }
 
-function CBML_GetMuleInfo(){
+function CBML_ScriptMsgEvents(msg){
 
-	Myfile = FileOpen("Configs/"+MyRealm+"/AMS/MuleInventory/" + me.account + "_" + me.name + ".txt",0);
-	if(!Myfile)
-		return;
-	var temp = Myfile.ReadLine();
-	if(temp == "true")
-		ladderType = true;
-		
+	ladderType = msg;
+	Print(ladderType);
+	settings = "done";	
 
-	Myfile.Close();
-
-	
 }

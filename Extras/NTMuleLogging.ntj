@@ -1,12 +1,16 @@
 // DiaBase Vers 1.0
-
+var settings = "";
 var verboseLogging = false;
-var databasesupport = true;
 
 //NTConfig_Script.push("TLInventory.ntj"); //Add this line to your NT Config to run it
 //NTConfig_TLInventory_SkipEquipped   = false;         // true = just log stash and inventory
 NTConfig_TLInventory_Delimeter      = "-";            // output file delimiter - see function TTL_WriteIt()
 NTConfig_TLInventory_SortOrder      = "QUALITY|TYPE|CLASS|NAME";
+
+var DiaBaseSupport = true;
+var mypass = "Unknown";
+var ladderType = false;
+
 
 function NTMain()
 {
@@ -22,10 +26,13 @@ function NTMain()
     if(!NTTM_CheckAct()) { NTC_SendMsgToScript("TLInventory.ntj", "NTTM_CheckAct()"); return; }
 	
 
-	if(databasesupport){
-		ML_GetMuleInfo();
+	if(DiaBaseSupport){
+		Print("Waiting for message");
+		while(settings != "done")
+			Delay(1000);
+
 		Delay(500);
-		Log_DoIt(true);
+		CBML_LogIt(true);
 	}
 	else
 		TLI_DoIt(verboseLogging);
@@ -276,17 +283,10 @@ function GetItemBase(id)
 	return "Unknown";
 }
 
-function ML_GetMuleInfo(){
+function CBML_ScriptMsgEvents(msg){
 
-	Myfile = FileOpen("AMS/MuleInventory/" + me.account + "_" + me.name + ".txt",0);
-	if(!Myfile)
-		return;
-	var temp = Myfile.ReadLine();
-	if(temp == "true")
-		ladderType = true;
-		
+	ladderType = msg;
+	Print(ladderType);
+	settings = "done";	
 
-	Myfile.Close();
-
-	
 }

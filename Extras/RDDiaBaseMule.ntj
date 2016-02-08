@@ -73,6 +73,7 @@ var retoon = false;
 var done = false;
 var ftjcount = 0;
 var MyRealm;
+var ladder = false;
 
 function NTMain(){
 	Delay(1000);
@@ -97,8 +98,8 @@ function NTMain(){
 					_ingame = true;
 
 					sendEventToOOG(D2NT_MGR_INGAME,"Mule: " + muleIndex +" In Game", 0);
-					Delay(500);
-					
+					Delay(10000);
+					MessageScript("CBMuleLogging.ntj", ladder);
 					lastGameStatus = 2; // in game successful
 					muleIndex++;
 					if (muleIndex > logTheseMules) {
@@ -283,7 +284,8 @@ function locationAction(location){
 			break;
 		}
 		
-		StoreLadderType(_info);
+		if(_info.indexOf("LADDER CHARACTER") != -1){	ladder = true;}
+		if(_info ){	SendCopyData(d2monitor, null, 900, _info[1] + " - MuleLogging");}
 		
 		sendEventToOOG(D2NT_MGR_PRINT_STATUS, location.name, 0);
 		
@@ -502,15 +504,18 @@ function getGameCounter(lastGameString, simple){
    }
 }
 
-function StoreLadderType(_txt){
-	var ladder = false;
+function MessageScript(scriptname,msg){
+	_script = GetScript();
+	if(_script){
+		do{
+			_scriptpath = _script.name.toLowerCase();
+			if(_scriptpath.indexOf(scriptname.toLowerCase()) != -1){
+				if(ladder == true)
+					return	_script.Send("true");				
+				return _script.Send("false");
+			}
+		} while(_script.GetNext());
+	}
 
-	if(_txt.indexOf("LADDER CHARACTER") != -1){
-		ladder = true;	
-	}	
-	
-	var fileName = "Configs/"+MyRealm+"/AMS/MuleInventory/" + me.account + "_" + _txt[1] + ".txt";
-	_file = FileOpen(fileName, 1);
-	_file.WriteLine(ladder);
-	_file.Close();
+	return null;
 }
