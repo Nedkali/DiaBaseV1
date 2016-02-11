@@ -27,12 +27,13 @@ function NTMain()
 	
 
 	if(DiaBaseSupport){
+		RegisterEvent(EVENT_SCRIPTMSG, CBML_ScriptMsgEvents);
 		Print("Waiting for message");
 		while(settings != "done")
 			Delay(1000);
 
 		Delay(500);
-		CBML_LogIt(true);
+		Log_DoIt(true);
 	}
 	else
 		TLI_DoIt(verboseLogging);

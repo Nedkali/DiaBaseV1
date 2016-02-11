@@ -97,7 +97,7 @@ function NTMain(){
 
 					sendEventToOOG(D2NT_MGR_INGAME,"Mule: " + muleIndex +" In Game", 0);
 					Delay(10000);
-					MessageScript("CBMuleLogging.ntj", ladder);					
+					MessageScript("NTMuleLogging.ntj", ladder);					
 					lastGameStatus = 2; // in game successful
 					muleIndex++;
 					if (muleIndex > logTheseMules) {
@@ -492,9 +492,9 @@ function MessageScript(scriptname,msg){
 		do{
 			_scriptpath = _script.name.toLowerCase();
 			if(_scriptpath.indexOf(scriptname.toLowerCase()) != -1){
-				if(ladder == true)
-					return	_script.Send("true");				
-				return _script.Send("false");
+				if(ladder == true){	_script.Send("true"); return	}				
+				_script.Send("false");
+				return;
 			}
 		} while(_script.GetNext());
 	}
