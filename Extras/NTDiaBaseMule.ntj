@@ -95,14 +95,14 @@ function NTMain(){
 				if(Load("NTBot/bots/NTMuleLogging.ntj")){
 					_ingame = true;
 
-					sendEventToOOG(D2NT_MGR_INGAME,"Mule: " + muleIndex +" In Game", 0);
+					sendEventToOOG(D2NT_MGR_INGAME,"Mule: " + (muleIndex+1) +" In Game", 0);
 					Delay(10000);
 					MessageScript("NTMuleLogging.ntj", ladder);					
 					lastGameStatus = 2; // in game successful
 					muleIndex++;
 					if (muleIndex > logTheseMules) {
 						done=true; 	
-						Delay(500); 
+						Delay(5000); 
 						sendEventToOOG(D2NT_MGR_PRINT_LOG, COLOR_2 + "NTMuleLog Complete.", 0); 
 						Print(COLOR_2 + "NTMuleLog Complete.");
 						break;
