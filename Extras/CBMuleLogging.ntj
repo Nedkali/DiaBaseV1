@@ -289,7 +289,9 @@ function GetItemBase(id)
 
 function CBML_ScriptMsgEvents(msg){
 
-	ladderType = msg;
+	if(msg == "true")
+		ladderType = true;
+	
 	Print(ladderType);
 	settings = "done";	
 
