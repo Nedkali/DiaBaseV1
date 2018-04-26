@@ -1,4 +1,4 @@
-// DiaBase Vers 1.0
+// DIABASE 1.02
 
 Include('Common/Libs/CLCommon.ntl');
 Include('Common/Globals/NTConfig.ntl');

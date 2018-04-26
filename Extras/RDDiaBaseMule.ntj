@@ -1,4 +1,4 @@
-// DiaBase Vers 1.0
+// DIABASE 1.02
 //////////////////////////////////////
 
 
@@ -73,7 +73,6 @@ var retoon = false;
 var done = false;
 var ftjcount = 0;
 var MyRealm;
-var ladder = false;
 
 function NTMain(){
 	Delay(1000);
@@ -97,14 +96,14 @@ function NTMain(){
 				if(Load("Common/Bots/CBMuleLogging.ntj")){
 					_ingame = true;
 
-					sendEventToOOG(D2NT_MGR_INGAME,"Mule: " + (muleIndex+1) +" In Game", 0);
-					Delay(10000);
-					MessageScript("CBMuleLogging.ntj", ladder);
+					sendEventToOOG(D2NT_MGR_INGAME, "In Game", 0);
+					Delay(500);
+					
 					lastGameStatus = 2; // in game successful
 					muleIndex++;
 					if (muleIndex > logTheseMules) {
 						done=true; 	
-						Delay(5000); 
+						Delay(500); 
 						sendEventToOOG(D2NT_MGR_PRINT_LOG, COLOR_2 + "NTMuleLog Complete.", 0); 
 						Print(COLOR_2 + "NTMuleLog Complete.");
 						break;
@@ -284,8 +283,7 @@ function locationAction(location){
 			break;
 		}
 		
-		if(_info.indexOf("LADDER CHARACTER") != -1){	ladder = true;}
-		if(_info ){	SendCopyData(d2monitor, null, 900, _info[1] + " - MuleLogging");}
+		StoreLadderType(_info);
 		
 		sendEventToOOG(D2NT_MGR_PRINT_STATUS, location.name, 0);
 		
@@ -454,7 +452,7 @@ function timeoutDelay(time, location){
 	while(endtime > GetTickCount()){
 		sendEventToOOG(D2NT_MGR_PRINT_STATUS, location.name + " (" + parseInt((endtime-GetTickCount())/1000) + "s)", 0);
 		Delay(1000);
-		if(me.ingame){ Delay(1000); return;}
+		if(me.ingame){ Delay(3000); return;}
 	}
 }
 
@@ -504,18 +502,15 @@ function getGameCounter(lastGameString, simple){
    }
 }
 
-function MessageScript(scriptname,msg){
-	_script = GetScript();
-	if(_script){
-		do{
-			_scriptpath = _script.name.toLowerCase();
-			if(_scriptpath.indexOf(scriptname.toLowerCase()) != -1){
-				if(ladder == true)
-					return	_script.Send("true");				
-				return _script.Send("false");
-			}
-		} while(_script.GetNext());
-	}
+function StoreLadderType(_txt){
+	var ladder = false;
 
-	return null;
+	if(_txt.indexOf("LADDER CHARACTER") != -1){
+		ladder = true;	
+	}	
+	
+	var fileName = "Configs/"+MyRealm+"/AMS/MuleInventory/" + me.account + "_" + _txt[1] + ".txt";
+	_file = FileOpen(fileName, 1);
+	_file.WriteLine(ladder);
+	_file.Close();
 }

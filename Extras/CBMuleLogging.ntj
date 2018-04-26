@@ -1,41 +1,24 @@
-// DiaBase Vers 1.0
+// DIABASE 1.02
 var settings = "";
-var verboseLogging = false;
-
-//NTConfig_Script.push("TLInventory.ntj"); //Add this line to your NT Config to run it
-//NTConfig_TLInventory_SkipEquipped   = false;         // true = just log stash and inventory
-NTConfig_TLInventory_Delimeter      = "-";            // output file delimiter - see function TTL_WriteIt()
-NTConfig_TLInventory_SortOrder      = "QUALITY|TYPE|CLASS|NAME";
-
-var DiaBaseSupport = true;
 var mypass = "Unknown";
 var ladderType = false;
 
-function NTMain()
-{
+
+function NTMain() {
     Include("Common/Libs/CLCommon.ntl");
     CLC_IncludeLibs();
 	
-    CLC_IncludeConfig("Common/Globals",false);
-
-    NT_LoadConfig();
 	SetStatusText(" CBMuleLogging.ntj");
     Print(COLOR_3 + "[MuleLog Inventory] - Load");
-	RegisterEvent(EVENT_SCRIPTMSG, CBML_ScriptMsgEvents);
+	RegisterEvent(EVENT_SCRIPTMSG, ML_ScriptMsgEvents);
 	
-    if(!CLTM_CheckAct()) { CLC_SendMsgToScript("TLInventory.ntj", "CLTM_CheckAct()"); return; }
+	Print("Waiting for message");
 	
-	if(DiaBaseSupport){
-		Print("Waiting for message");
-		while(settings != "done")
-			Delay(1000);
+	while(settings != "done"){	Delay(1000); }
 
-		Delay(500);
-		CBML_LogIt(true);
-	}
-	else
-		CLU_TLIDoIt(verboseLogging);
-	
+
+	ML_LogIt(true);
+
 	Delay(5000);
 	CLC_SendLogToOOG(0, COLOR_8 + "Successfully logged: "+MyRealm+"/"+me.charname, 0); 
 
@@ -45,7 +28,7 @@ function NTMain()
     CLC_SendMsgToScript("CScriptControl.ntj", "SCRIPT_END");
 }
 
-function CBML_LogIt(verbose) {
+function ML_LogIt(verbose) {
 	var CTC_MyTime = new Date().toLocaleFormat("%H:%M:%S");
 	var mydate = new Date()
 	Print;
@@ -70,15 +53,13 @@ function CBML_LogIt(verbose) {
 			ignore = _NTT_IgnoredItems.join("-");
 			ignore += "-box";
          
-			if(ignore.indexOf(item.code) == -1) {
-				if(!NTConfig_TLInventory_SkipEquipped)
-					logged.push(item);
-				else if (item.mode == 0)
+			if(ignore.indexOf(item.code) == -1 & item.mode == 0) {
 					logged.push(item);
 			}
 		}
 		if (logged.length) {
 			var fileName = "Configs/"+MyRealm+"/AMS/MuleInventory/" + me.account + "_" + me.name + ".txt";
+			//var fileName = "Configs/Europe/AMS/MuleInventory/" + me.account + "_" + me.name + ".txt";
 			_file = FileOpen(fileName, 1);
 			if (_file) {
 				_file.WriteLine("Unknown");
@@ -99,7 +80,7 @@ function CBML_LogIt(verbose) {
 				_file.WriteLine(mydate.getDate() + "/" + (mydate.getMonth()+1) + "/" + mydate.getFullYear());
 				_file.WriteLine("");
 				for (var i = 0; i < logged.length; i++)
-					ItemDecipher(_file, logged[i], verbose);
+					ML_ItemDecipher(_file, logged[i], verbose);
 				_file.Close();
 				Print (COLOR_2 + logged.length + " items written to - " + fileName + " -");
 			}
@@ -111,10 +92,11 @@ function CBML_LogIt(verbose) {
 	}
 	else
 		Print(COLOR_1 + "No items on this character to log");
+	
+	return;
 }
 
-function ItemDecipher(file, item, verbose)
-{
+function ML_ItemDecipher(file, item, verbose) {
 	var name = item.name;
 	var UNIDtext = "";
 	
@@ -124,41 +106,39 @@ function ItemDecipher(file, item, verbose)
 	if(item.itemtype >= 91 && item.itemtype <= 102)
 		file.WriteLine("Item Base Gem");
 	else
-		file.WriteLine("Item Base " + GetItemBase(item.itemtype));	
-	file.WriteLine("Item Quality " + GetQuality(item.quality));
+		file.WriteLine("Item Base " + ML_GetItemBase(item.itemtype));	
+	file.WriteLine("Item Quality " + ML_GetQuality(item.quality));
 	file.WriteLine("Item Image " + item.classid);
 	if((item.itemflag&0x4000000) > 0)
 		file.WriteLine("True");
 	else
 		file.WriteLine("False");
 		
-	if (!(item.itemflag & 0x10)) {
-		for (var qual in _NTIPAliasQuality) {
-			if (_NTIPAliasQuality[qual]==item.quality) UNIDtext+=qual.charAt(0).toUpperCase() + qual.substr(1) + "/";
-		}
-		var s = item.itemdesc;
-		s = s.replace(REGEX6, REPLACE6); 
-		var def = s.match(/.*(Defense: \d+).*/);
-		if (def!=null) {
-			def[0] = def[0].replace(/Defense:/,"Def");
-			UNIDtext += def[0]+"/";
-		}
-		UNIDtext += "Unidentified";
-		if (item.itemflag & 0x400000) UNIDtext+="/Ethereal";
-		 file.WriteLine(UNIDtext);
-		
-		
-	// 74 is rune, 91 - 102 is gem  
-	} else if (item.itemtype!=74 && !(item.itemtype >= 91 && item.itemtype <= 102)) {
-		file.WriteLine(CLU_ItemDesc(item.itemdesc, item.name, verbose));
-	}
+	file.WriteLine(ML_ItemDesc(item.itemdesc, item.name));
+
 	file.WriteLine("");
 
 
 }
 
-function GetQuality(id)
-{
+function ML_ItemDesc(s, name) {
+	
+	s = s.replace(REGEX6, REPLACE6);  
+	re = new RegExp(name, "gi");
+	s = s.replace(re, "");
+	
+	s = s.replace(/\n\n/g, "\n");
+	s = s.replace(/^\s*/, "");
+	s = s.replace(/\s*$/, "");
+	
+	
+	return s;
+	
+}
+
+
+
+function ML_GetQuality(id) {
 	
 	switch(id)
 	{
@@ -175,11 +155,9 @@ function GetQuality(id)
 	return "Unknown";
 }
 
-function GetItemBase(id)
-{
+function ML_GetItemBase(id) {
 
-	switch(id)
-	{
+	switch(id) {
 
 	case 2:	return "Shield";
 	case 3:	return "Armor";
@@ -287,7 +265,7 @@ function GetItemBase(id)
 	return "Unknown";
 }
 
-function CBML_ScriptMsgEvents(msg){
+function ML_ScriptMsgEvents(msg) {
 
 	if(msg == "true")
 		ladderType = true;
