@@ -1,12 +1,11 @@
 // DIABASE 1.02
-//////////////////////////////////////
 /**
-*	@filename	MuleLogger.js
-*	@author		kolton
-*	@desc		Modified by Ned for Diabase compatability
+*	@filename	DiabaseLogger.js
+*	@author		kolton MuleLogger.js
+*	@desc		Modified by Ned for Diabase compatibility
 */
 
-var MuleLogger = {
+var DiabaseLogger = {
 	LogAccounts: {
 		/* Format: 
 			"account1/password1/realm": ["charname1", "charname2 etc"],
@@ -26,16 +25,14 @@ var MuleLogger = {
 
 	LogGame: ["", ""], // ["gamename", "password"]
 
-	IngameTime: 185, // Time to stay in game
-
-
+	IngameTime: ((Math.random() * 20) + 180), // Time to stay in game
 
 	inGameCheck: function () {
 		
 		
-		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
-			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
+		if (getScript("DiabaseMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
+			print("ÿc4DiabaseLoggerÿc0: Logging items on " + me.name + ".");
+			D2Bot.printToConsole("DiabaseLogger: Logging items on " + me.name + ".", 7);
 			this.logChar();
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {

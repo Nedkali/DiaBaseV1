@@ -1,9 +1,13 @@
 // DIABASE 1.02
-////////////////////////////
+/**
+*	@filename	DiabaseMuleLog.dbj
+*	@author		kolton
+*	@desc		Modified by Ned for Diabase compatibility
+*/
 
 var StarterConfig = {
-	MinGameTime: 0, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
-	CreateGameDelay: 5, // Seconds to wait before creating a new game
+	MinGameTime: 120, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	CreateGameDelay: ((Math.random() * 10) + 10), // Seconds to wait before creating a new game
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
@@ -16,12 +20,10 @@ var StarterConfig = {
 	WaitInLineTimeout: 60 // Seconds to wait before cancelling the 'Waiting in Line...' screen
 };
 
-
-
 // No touchy!
 include("json2.js");
 include("OOG.js");
-include("DiaBaseLogger.js");
+include("DiabaseLogger.js");
 include("gambling.js");
 include("common/misc.js");
 
@@ -38,10 +40,10 @@ var handle, gameInfo, gameStart, ingame, firstLogin, connectFail, chatActionsDon
 function parseInfo() {
 	var i;
 
-	for (i in DiaBaseLogger.LogAccounts) {
-		if (DiaBaseLogger.LogAccounts.hasOwnProperty(i) && typeof i === "string") {
+	for (i in DiabaseLogger.LogAccounts) {
+		if (DiabaseLogger.LogAccounts.hasOwnProperty(i) && typeof i === "string") {
 			accounts.push(i);
-			chars.push(DiaBaseLogger.LogAccounts[i]);
+			chars.push(DiabaseLogger.LogAccounts[i]);
 		}
 	}
 }
@@ -105,6 +107,28 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function timer(tick) {
+	if (!tick) {
+		return "";
+	}
+
+	var min, sec;
+
+	min = Math.floor((getTickCount() - tick) / 60000).toString();
+
+	if (min <= 9) {
+		min = "0" + min;
+	}
+
+	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
+
+	if (sec <= 9) {
+		sec = "0" + sec;
+	}
+
+	return " (" + min + ":" + sec + ")";
+}
+
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 
@@ -156,6 +180,8 @@ function main() {
 
 					DataFile.updateStats("runs", gameCount);
 				}
+				
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -239,7 +265,7 @@ MainSwitch:
 		}
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		createGame(DiaBaseLogger.LogGame[0] + gameCount, DiaBaseLogger.LogGame[1], 0);
+		createGame(DiabaseLogger.LogGame[0] + gameCount, DiabaseLogger.LogGame[1], 0);
 		locationTimeout(5000, location);
 
 		lastGameStatus = "pending";
